@@ -4,7 +4,10 @@ from psycopg2 import sql
 import json
 import requests
 
-def create_table(conn):
+def create_cards_table(conn):
+    """
+    Creates the table of all cards from a stored json file.
+    """
     with conn.cursor() as cursor:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS cards (
@@ -14,15 +17,19 @@ def create_table(conn):
                 cmc VARCHAR(255),
                 type_line VARCHAR(255),
                 rarity VARCHAR(100),
-                set_name VARCHAR(255)
+                set_name VARCHAR(255),
+                set_id INT REFERENCES sets(set_id)
             )
         """)
         conn.commit()
 
 def create_set_table(conn):
+    """
+    Creates the table of all sets from Scryfall API.
+    """
     with conn.cursor() as cursor:
         cursor.execute("""
-            CREATE TABLE sets (
+            CREATE TABLE IF NOT EXISTS sets (
                 set_id SERIAL PRIMARY KEY,
                 code VARCHAR(10),
                 set_name VARCHAR(255),
@@ -31,22 +38,21 @@ def create_set_table(conn):
             )
         """)
 
-# Function to fetch card data from Scryfall
 def fetch_card_data():
-    # Get the current script's directory
+    """
+    Fetches a json file of all cards i have stored somewhere else (its too big).
+    """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Specify the JSON file name
-    json_file_path = os.path.join(script_dir, '/Users/oliver/Documents/big_files/all_cards.json')  # Replace with your actual file name
+    json_file_path = os.path.join(script_dir, '/Users/oliver/Documents/big_files/all_cards.json')
 
-    # Open and load the JSON file
     with open(json_file_path, 'r') as file:
         data = json.load(file)
-    
     return data
 
-# Function to insert card data into the database
 def insert_card_data(conn, card):
+    """
+    Populates each column of the cards table.
+    """
     with conn.cursor() as cursor:
         insert_query = sql.SQL("""
             INSERT INTO cards (name, mana_cost, cmc, type_line, rarity, set_name)
@@ -63,7 +69,20 @@ def insert_card_data(conn, card):
     conn.commit()
 
 def insert_set_data(conn, set):
-    pass
+    """
+    Populates the sets table.
+    """
+    with conn.cursor() as cursor:
+        insert_query = sql.SQL("""
+            INSERT INTO sets (code, set_name, set_type, block)
+            VALUES (%s, %s, %s, %s)
+        """)
+        cursor.execute(insert_query, (
+            set.get('code'),
+            set.get('name'),
+            set.get('set_type'),
+            set.get('block')
+        ))
         
 
 def main():
@@ -71,6 +90,7 @@ def main():
     conn = psycopg2.connect(dbname='mtg_db', user='oliver', password='swipeit63', host='localhost')
 
     if conn:
+        create_set_table(conn)
         # fetch set data
         url = 'https://api.scryfall.com/sets'
         response = requests.get(url)
@@ -78,12 +98,12 @@ def main():
         if response.status_code == 200:
             sets_data = response.json()
 
-            for set in sets_data:
+            for set in sets_data['data']:
                 insert_set_data(conn, set)
         else:
             print(f"Error: {response.status_code}")
 
-        create_table(conn)
+        create_cards_table(conn)
         # fetch card data
         card_data = fetch_card_data()
         for card in card_data:
