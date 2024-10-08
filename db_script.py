@@ -9,13 +9,12 @@ def create_table(conn):
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS cards (
                 id SERIAL PRIMARY KEY,
-                name VARCHAR(100),
-                mana_cost VARCHAR(15),
-                cmc VARCHAR(15)
-                type_line VARCHAR(100),
-                rarity VARCHAR(20),
-                set_name VARCHAR(100)
-                set_id INT REFERENCES sets(set_id)
+                name VARCHAR(255),
+                mana_cost VARCHAR(255),
+                cmc VARCHAR(255),
+                type_line VARCHAR(255),
+                rarity VARCHAR(100),
+                set_name VARCHAR(255)
             )
         """)
         conn.commit()
@@ -25,10 +24,10 @@ def create_set_table(conn):
         cursor.execute("""
             CREATE TABLE sets (
                 set_id SERIAL PRIMARY KEY,
-                code VARCHAR(10)
-                set_name VARCHAR(100)
-                set_type VARCHAR(25)
-                block VARCHAR(50)
+                code VARCHAR(10),
+                set_name VARCHAR(255),
+                set_type VARCHAR(255),
+                block VARCHAR(255)
             )
         """)
 
@@ -38,7 +37,7 @@ def fetch_card_data():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Specify the JSON file name
-    json_file_path = os.path.join(script_dir, 'all_cards.json')  # Replace with your actual file name
+    json_file_path = os.path.join(script_dir, '/Users/oliver/Documents/big_files/all_cards.json')  # Replace with your actual file name
 
     # Open and load the JSON file
     with open(json_file_path, 'r') as file:
@@ -50,12 +49,13 @@ def fetch_card_data():
 def insert_card_data(conn, card):
     with conn.cursor() as cursor:
         insert_query = sql.SQL("""
-            INSERT INTO cards (name, mana_cost, type_line, rarity, set_name, )
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO cards (name, mana_cost, cmc, type_line, rarity, set_name)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """)
         cursor.execute(insert_query, (
             card.get('name'),
             card.get('mana_cost'),
+            card.get('cmc'),
             card.get('type_line'),
             card.get('rarity'),
             card.get('set_name')
