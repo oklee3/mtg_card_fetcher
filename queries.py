@@ -32,7 +32,7 @@ def main():
             else:
                 print("\nMatching Cards:")
                 for name in results:
-                    print()
+                    print(name)
         elif query_type == '2':
             name = input("Enter a card name to find its oracle text: ")
             result = return_card_info(name.lower(), conn)
