@@ -1,3 +1,9 @@
+'''
+oliver lee
+
+create database tables, updates with current sets each time it is run
+'''
+
 import os
 import psycopg2
 from psycopg2 import sql
