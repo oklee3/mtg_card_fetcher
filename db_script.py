@@ -16,6 +16,7 @@ def create_cards_table(conn):
                 mana_cost VARCHAR(255),
                 cmc VARCHAR(255),
                 type_line VARCHAR(255),
+                oracle_text TEXT,
                 rarity VARCHAR(100),
                 set_name VARCHAR(255),
                 set_id INT REFERENCES sets(set_id)
@@ -55,14 +56,15 @@ def insert_card_data(conn, card):
     """
     with conn.cursor() as cursor:
         insert_query = sql.SQL("""
-            INSERT INTO cards (name, mana_cost, cmc, type_line, rarity, set_name)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO cards (name, mana_cost, cmc, type_line, oracle_text, rarity, set_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """)
         cursor.execute(insert_query, (
             card.get('name'),
             card.get('mana_cost'),
             card.get('cmc'),
             card.get('type_line'),
+            card.get('oracle_text'),
             card.get('rarity'),
             card.get('set_name')
         ))
