@@ -25,7 +25,10 @@ def create_cards_table(conn):
                 oracle_text TEXT,
                 rarity VARCHAR(100),
                 set_name VARCHAR(255),
-                set_id INT REFERENCES sets(set_id)
+                set_id INT REFERENCES sets(set_id),
+                image_uri_normal TEXT,
+                image_uri_large TEXT,
+                image_uri_art_crop TEXT
             )
         """)
         conn.commit()
@@ -61,9 +64,21 @@ def insert_card_data(conn, card):
     Populates each column of the cards table.
     """
     with conn.cursor() as cursor:
+        # First, look up the set_id using the card's set code
+        cursor.execute("""
+            SELECT set_id FROM sets WHERE code = %s
+        """, (card.get('set'),))  # 'set' is the code field in card data
+        set_id = cursor.fetchone()
+
+        # Get image URIs, handling cases where they might not exist
+        image_uris = card.get('image_uris', {})
+        
         insert_query = sql.SQL("""
-            INSERT INTO cards (name, mana_cost, cmc, type_line, oracle_text, rarity, set_name)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO cards (
+                name, mana_cost, cmc, type_line, oracle_text, rarity, 
+                set_name, set_id, image_uri_normal, image_uri_large, image_uri_art_crop
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """)
         cursor.execute(insert_query, (
             card.get('name'),
@@ -72,7 +87,11 @@ def insert_card_data(conn, card):
             card.get('type_line'),
             card.get('oracle_text'),
             card.get('rarity'),
-            card.get('set_name')
+            card.get('set_name'),
+            set_id[0] if set_id else None,
+            image_uris.get('normal'),
+            image_uris.get('large'),
+            image_uris.get('art_crop')
         ))
     conn.commit()
 

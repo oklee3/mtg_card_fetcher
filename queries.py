@@ -39,10 +39,11 @@ def main():
             if len(result) == 0:
                 print("No results found.")
             else:
-                mana_cost, type, oracle = result[0]
+                mana_cost, type, oracle, image_uri_normal, image_uri_large, image_uri_art_crop = result[0]
                 print(f"\n{name}  {mana_cost}")
                 print(f"{type}")
                 print("\n" + oracle)
+                print(f"Image URIs: normal={image_uri_normal}, large={image_uri_large}, art_crop={image_uri_art_crop}")
         else:
             print("Invalid option. Please try again.")
 
@@ -61,12 +62,18 @@ def search_cards(text, col, conn):
 
 def return_card_info(name, conn):
     """
-    Given a card name, return its info
+    Given a card name, return its info including image URIs
     """
-    query = f"SELECT mana_cost, type_line, oracle_text FROM cards WHERE LOWER(name)='{name}' LIMIT 1"
+    query = """
+        SELECT mana_cost, type_line, oracle_text, 
+               image_uri_normal, image_uri_large, image_uri_art_crop 
+        FROM cards 
+        WHERE LOWER(name)=LOWER(%s) 
+        LIMIT 1
+    """
 
     with conn.cursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(query, (name,))
         result = [list(row) for row in cursor.fetchall()]
         cursor.close()
         return result
