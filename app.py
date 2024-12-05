@@ -15,7 +15,7 @@ def get_db_connection():
     return psycopg2.connect(
         dbname='mtg_db',
         user='oliver',
-        password='swipeit63',
+        password=os.environ.get('DB_PASSWORD'),
         host='localhost'
     )
 

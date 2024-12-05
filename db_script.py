@@ -142,7 +142,12 @@ def insert_set_data(conn, set):
 
 def main():
     # connect to database
-    conn = psycopg2.connect(dbname='mtg_db', user='oliver', password='swipeit63', host='localhost')
+    conn = psycopg2.connect(
+        dbname='mtg_db',
+        user='oliver',
+        password=os.environ.get('DB_PASSWORD'),
+        host='localhost'
+    )
 
     if conn:
         create_set_table(conn)
