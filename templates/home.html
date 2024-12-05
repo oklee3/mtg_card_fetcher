@@ -4,34 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTG Card Database</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .search-container {
-            margin-bottom: 20px;
-        }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .card-item {
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/main.css">
 </head>
 <body>
-    <h1>MTG Card Database</h1>
+    <header style="border-bottom: 1px solid #ccc; margin-bottom: 40px; padding-bottom: 20px;">
+        <h1 class="title">MTG Card Database</h1>
+        <small>by oklee</small>
+    </header>
     
     <div class="search-container">
-        <input type="text" id="cardName" placeholder="Search by card name">
-        <button onclick="searchCards()">Search</button>
+        <div class="search-controls">
+            <div class="input-group">
+                <label for="cardName">Card Name:</label>
+                <input type="text" id="cardName" placeholder="Enter card name" class="search-input">
+            </div>
+            <div class="input-group">
+                <label for="oracleText">Card Text:</label>
+                <input type="text" id="oracleText" placeholder="Search card text" class="search-input">
+            </div>
+            <button onclick="searchCards()" class="search-button">Search</button>
+        </div>
     </div>
 
     <div id="results" class="card-grid"></div>
@@ -39,9 +31,11 @@
     <script>
         async function searchCards() {
             const cardName = document.getElementById('cardName').value;
+            const oracleText = document.getElementById('oracleText').value;
             
             let url = '/api/cards?';
-            if (cardName) url += `name=${encodeURIComponent(cardName)}`;
+            if (cardName) url += `name=${encodeURIComponent(cardName)}&`;
+            if (oracleText) url += `oracle=${encodeURIComponent(oracleText)}`;
             
             const response = await fetch(url);
             const cards = await response.json();
@@ -58,6 +52,7 @@
                 if (card.image_uri_normal) {
                     const cardDiv = document.createElement('div');
                     cardDiv.className = 'card-item';
+                    cardDiv.style.border = 'none';
                     cardDiv.innerHTML = `
                         <img src="${card.image_uri_normal}" alt="${card.name}" style="width: 100%;">
                     `;
