@@ -37,10 +37,23 @@ body {
     gap: 5px;
 }
 
+.input-group-small {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 10px;
+}
+
 .search-input {
     padding: 10px;
     font-size: 16px;
-    width: 250px;
+    width: 200px;
+}
+
+.search-input-small {
+    padding: 10px;
+    font-size: 16px;
+    width: 120px;
 }
 
 .search-button {

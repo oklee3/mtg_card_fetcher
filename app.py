@@ -41,6 +41,7 @@ def get_cards(conn):
     """Get all cards with optional filtering"""
     name = request.args.get('name')
     oracle = request.args.get('oracle')
+    cmc = request.args.get('cmc')
     
     # add params to query to filter for desired cards
     query = "SELECT * FROM cards WHERE 1=1"
@@ -55,6 +56,10 @@ def get_cards(conn):
         query += " AND (LOWER(oracle_text) LIKE LOWER(%s) OR LOWER(COALESCE(face_oracle_text, '')) LIKE LOWER(%s) OR LOWER(COALESCE(card_faces->1->>'oracle_text', '')) LIKE LOWER(%s))"
         params.extend([f'%{oracle}%', f'%{oracle}%', f'%{oracle}%'])
     
+    if cmc:
+        query += " AND ROUND(CAST(cmc AS NUMERIC)) = %s"
+        params.append(cmc)
+
     query += " ORDER BY name ASC LIMIT 100"
     
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
