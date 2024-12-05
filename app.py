@@ -37,12 +37,12 @@ def db_handler(f):
 
 @app.route('/api/cards', methods=['GET'])
 @db_handler
-
 def get_cards(conn):
     """Get all cards with optional filtering"""
     name = request.args.get('name')
     oracle = request.args.get('oracle')
     
+    # add params to query to filter for desired cards
     query = "SELECT * FROM cards WHERE 1=1"
     params = []
     
@@ -51,8 +51,9 @@ def get_cards(conn):
         params.append(f'%{name}%')
         
     if oracle:
-        query += " AND LOWER(oracle_text) LIKE LOWER(%s)"
-        params.append(f'%{oracle}%')
+        # if the card has multiple faces, check all faces for the oracle text
+        query += " AND (LOWER(oracle_text) LIKE LOWER(%s) OR LOWER(COALESCE(face_oracle_text, '')) LIKE LOWER(%s) OR LOWER(COALESCE(card_faces->1->>'oracle_text', '')) LIKE LOWER(%s))"
+        params.extend([f'%{oracle}%', f'%{oracle}%', f'%{oracle}%'])
     
     query += " ORDER BY name ASC LIMIT 100"
     

@@ -15,6 +15,7 @@ def create_cards_table(conn):
     Creates the table of all cards from a stored json file.
     """
     with conn.cursor() as cursor:
+        #cursor.execute("DROP TABLE IF EXISTS cards CASCADE")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS cards (
                 id SERIAL PRIMARY KEY,
@@ -28,7 +29,12 @@ def create_cards_table(conn):
                 set_id INT REFERENCES sets(set_id),
                 image_uri_normal TEXT,
                 image_uri_large TEXT,
-                image_uri_art_crop TEXT
+                image_uri_art_crop TEXT,
+                card_faces JSONB,
+                face_oracle_text TEXT,
+                face_image_uri_normal TEXT,
+                face_image_uri_large TEXT,
+                face_image_uri_art_crop TEXT
             )
         """)
         conn.commit()
@@ -73,12 +79,29 @@ def insert_card_data(conn, card):
         # Get image URIs, handling cases where they might not exist
         image_uris = card.get('image_uris', {})
         
+        # Handle card faces
+        card_faces = card.get('card_faces', [])
+        face_oracle_text = None
+        face_image_uri_normal = None
+        face_image_uri_large = None
+        face_image_uri_art_crop = None
+
+        if card_faces:
+            # Assuming you want to store the first face's details
+            first_face = card_faces[0]
+            face_oracle_text = first_face.get('oracle_text')
+            face_image_uris = first_face.get('image_uris', {})
+            face_image_uri_normal = face_image_uris.get('normal')
+            face_image_uri_large = face_image_uris.get('large')
+            face_image_uri_art_crop = face_image_uris.get('art_crop')
+
         insert_query = sql.SQL("""
             INSERT INTO cards (
                 name, mana_cost, cmc, type_line, oracle_text, rarity, 
-                set_name, set_id, image_uri_normal, image_uri_large, image_uri_art_crop
+                set_name, set_id, image_uri_normal, image_uri_large, image_uri_art_crop,
+                card_faces, face_oracle_text, face_image_uri_normal, face_image_uri_large, face_image_uri_art_crop
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """)
         cursor.execute(insert_query, (
             card.get('name'),
@@ -91,7 +114,12 @@ def insert_card_data(conn, card):
             set_id[0] if set_id else None,
             image_uris.get('normal'),
             image_uris.get('large'),
-            image_uris.get('art_crop')
+            image_uris.get('art_crop'),
+            json.dumps(card_faces) if card_faces else None,
+            face_oracle_text,
+            face_image_uri_normal,
+            face_image_uri_large,
+            face_image_uri_art_crop
         ))
     conn.commit()
 

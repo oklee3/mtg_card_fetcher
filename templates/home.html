@@ -43,22 +43,47 @@
             console.log('API Response:', cards);
             displayResults(cards);
         }
-
         function displayResults(cards) {
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
             
             cards.forEach(card => {
-                if (card.image_uri_normal) {
-                    const cardDiv = document.createElement('div');
-                    cardDiv.className = 'card-item';
-                    cardDiv.style.border = 'none';
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card-item';
+                cardDiv.style.border = 'none';
+
+                if (card.face_image_uri_normal && card.card_faces && card.card_faces[1] && card.card_faces[1].image_uris) {
+                    // card has multiple faces
+                    const frontImage = card.face_image_uri_normal;
+                    const backImage = card.card_faces[1].image_uris.normal;
+                    
                     cardDiv.innerHTML = `
-                        <img src="${card.image_uri_normal}" alt="${card.name}" style="width: 100%;">
+                        <div class="flip-card">
+                            <img src="${frontImage}" alt="${card.name}" style="width: 100%;" data-front="${frontImage}" data-back="${backImage}">
+                            <button onclick="flipCard(this)" class="flip-button">Flip</button>
+                        </div>
                     `;
-                    resultsDiv.appendChild(cardDiv);
+                } else {
+                    // single faced card
+                    const imageUrl = card.image_uri_normal;
+                    if (imageUrl) {
+                        cardDiv.innerHTML = `
+                            <img src="${imageUrl}" alt="${card.name}" style="width: 100%;">
+                        `;
+                    }
                 }
+                
+                resultsDiv.appendChild(cardDiv);
             });
+        }
+
+        function flipCard(button) {
+            const img = button.previousElementSibling;
+            const currentSrc = img.src;
+            const frontSrc = img.dataset.front;
+            const backSrc = img.dataset.back;
+            
+            img.src = currentSrc === frontSrc ? backSrc : frontSrc;
         }
     </script>
 </body>
