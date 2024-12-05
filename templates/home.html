@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTG Card Database</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>MTG Card Database</h1>
+    
+    <div class="search-container">
+        <input type="text" id="cardName" placeholder="Search by card name">
+        <button onclick="searchCards()">Search</button>
+    </div>
+
+    <div id="results" class="card-grid"></div>
+
+    <script>
+        async function searchCards() {
+            const cardName = document.getElementById('cardName').value;
+            
+            let url = '/api/cards?';
+            if (cardName) url += `name=${encodeURIComponent(cardName)}`;
+            
+            const response = await fetch(url);
+            const cards = await response.json();
+            
+            console.log('API Response:', cards);
+            displayResults(cards);
+        }
+
+        function displayResults(cards) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            
+            cards.forEach(card => {
+                if (card.image_uri_normal) {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card-item';
+                    cardDiv.innerHTML = `
+                        <img src="${card.image_uri_normal}" alt="${card.name}" style="width: 100%;">
+                    `;
+                    resultsDiv.appendChild(cardDiv);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
