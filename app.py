@@ -43,6 +43,7 @@ def get_cards(conn):
     oracle = request.args.get('oracle')
     cmc = request.args.get('cmc')
     colors = request.args.get('colors')
+    colorLogic = request.args.get('colorLogic')
     
     # add params to query to filter for desired cards
     query = "SELECT * FROM cards WHERE 1=1"
@@ -63,11 +64,15 @@ def get_cards(conn):
 
     if colors:
         color_identity = colors.split(",")
-        if 'C' in color_identity:
-            query += " AND (color_identity && %s OR color_identity = '{}')"
+        if colorLogic == "all":
+            query += " AND color_identity @> %s"
+            params.append(color_identity)
         else:
-            query += " AND color_identity && %s"
-        params.append(color_identity)
+            if 'C' in color_identity:
+                query += " AND (color_identity && %s OR color_identity = '{}')"
+            else:
+                query += " AND color_identity && %s"
+            params.append(color_identity)
 
     query += " ORDER BY name ASC LIMIT 100;"
     print(query)

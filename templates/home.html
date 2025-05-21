@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/main.css">
 </head>
 <body>
-    <header style="border-bottom: 1px solid #ccc; margin-bottom: 40px; padding-bottom: 20px;">
+    <header>
         <h1 class="title">MTG Card Database</h1>
         <small>by oklee</small>
     </header>
@@ -22,13 +22,19 @@
                 <label for="oracleText">Oracle Text:</label>
                 <input type="text" id="oracleText" placeholder="Filter by oracle text" class="search-input">
             </div>
-            <div class="input-group-small">
+            <div class="input-group">
                 <label for="cmc">CMC:</label>
-                <input type="text" id="cmc" placeholder="Filter by cmc" class="search-input-small">
+                <input type="text" id="cmc" placeholder="Filter by cmc" class="search-input">
             </div>
         </div>
-        <div class="input-group" style="margin-top: 15px;">
-            <label style="display: block; margin-bottom: 5px;">Color:</label>
+        <div class="input-group">
+            <label>Color:</label>
+            <div class="color-logic-selector">
+                <select id="colorLogic" class="color-logic-dropdown">
+                    <option value="any">Include Any</option>
+                    <option value="all">Include All</option>
+                </select>
+            </div>
             <div class="color-checkboxes">
                 <label><input type="checkbox" name="color" value="W"> White</label>
                 <label><input type="checkbox" name="color" value="U"> Blue</label>
@@ -38,8 +44,8 @@
                 <label><input type="checkbox" name="color" value="C"> Colorless</label>
             </div>
         </div>
-        <div style="text-align: left; margin-top: 20px;">
-            <button onclick="searchCards()" class="search-button" style="padding: 15px 40px; font-size: 18px;">Search</button>
+        <div class="search-button-container">
+            <button onclick="searchCards()" class="search-button">Search</button>
         </div>
     </div>
 

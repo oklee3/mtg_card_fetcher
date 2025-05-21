@@ -10,12 +10,16 @@ async function searchCards() {
             const cmc = document.getElementById('cmc').value;
             const colors = Array.from(document.querySelectorAll('input[name="color"]:checked'))
                            .map(cb => cb.value);
+            const color_filter = document.getElementById('colorLogic').value;
             
             let url = '/api/cards?';
             if (cardName) url += `name=${encodeURIComponent(cardName)}&`;
             if (oracleText) url += `oracle=${encodeURIComponent(oracleText)}&`;
             if (cmc) url += `cmc=${encodeURIComponent(cmc)}&`;
-            if (colors.length > 0) url += `colors=${encodeURIComponent(colors.join(','))}&`;
+            if (colors.length > 0) {
+                url += `colors=${encodeURIComponent(colors.join(','))}&`;
+                url += `colorLogic=${encodeURIComponent(color_filter)}&`;
+            }
             const response = await fetch(url);
             const cards = await response.json();
             
