@@ -34,7 +34,8 @@ def create_cards_table(conn):
                 face_oracle_text TEXT,
                 face_image_uri_normal TEXT,
                 face_image_uri_large TEXT,
-                face_image_uri_art_crop TEXT
+                face_image_uri_art_crop TEXT,
+                color_identity TEXT[]
             )
         """)
         conn.commit()
@@ -99,9 +100,10 @@ def insert_card_data(conn, card):
             INSERT INTO cards (
                 name, mana_cost, cmc, type_line, oracle_text, rarity, 
                 set_name, set_id, image_uri_normal, image_uri_large, image_uri_art_crop,
-                card_faces, face_oracle_text, face_image_uri_normal, face_image_uri_large, face_image_uri_art_crop
+                card_faces, face_oracle_text, face_image_uri_normal, face_image_uri_large, face_image_uri_art_crop,
+                color_identity
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """)
         cursor.execute(insert_query, (
             card.get('name'),
@@ -119,9 +121,9 @@ def insert_card_data(conn, card):
             face_oracle_text,
             face_image_uri_normal,
             face_image_uri_large,
-            face_image_uri_art_crop
+            face_image_uri_art_crop,
+            card.get('color_identity', [])
         ))
-    conn.commit()
 
 def insert_set_data(conn, set):
     """

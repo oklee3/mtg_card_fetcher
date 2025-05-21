@@ -57,7 +57,7 @@ def get_cards(conn):
         params.extend([f'%{oracle}%', f'%{oracle}%', f'%{oracle}%'])
     
     if cmc:
-        query += " AND ROUND(CAST(cmc AS NUMERIC)) = %s"
+        query += " AND CAST(cmc AS NUMERIC) = %s"
         params.append(cmc)
 
     query += " ORDER BY name ASC LIMIT 100"
