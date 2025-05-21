@@ -8,13 +8,14 @@ async function searchCards() {
             const cardName = document.getElementById('cardName').value;
             const oracleText = document.getElementById('oracleText').value;
             const cmc = document.getElementById('cmc').value;
-            const checkedColors = Array.from(document.querySelectorAll('input[name="color"]:checked'))
+            const colors = Array.from(document.querySelectorAll('input[name="color"]:checked'))
                            .map(cb => cb.value);
             
             let url = '/api/cards?';
             if (cardName) url += `name=${encodeURIComponent(cardName)}&`;
             if (oracleText) url += `oracle=${encodeURIComponent(oracleText)}&`;
             if (cmc) url += `cmc=${encodeURIComponent(cmc)}&`;
+            if (colors) url+= 'colors=${encodeURIComponent(colors)}&`;'
             const response = await fetch(url);
             const cards = await response.json();
             

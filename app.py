@@ -42,6 +42,7 @@ def get_cards(conn):
     name = request.args.get('name')
     oracle = request.args.get('oracle')
     cmc = request.args.get('cmc')
+    colors = request.args.get('colors')
     
     # add params to query to filter for desired cards
     query = "SELECT * FROM cards WHERE 1=1"
@@ -59,6 +60,9 @@ def get_cards(conn):
     if cmc:
         query += " AND CAST(cmc AS NUMERIC) = %s"
         params.append(cmc)
+
+    if colors:
+        print(colors)
 
     query += " ORDER BY name ASC LIMIT 100"
     
