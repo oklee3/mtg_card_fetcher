@@ -62,9 +62,15 @@ def get_cards(conn):
         params.append(cmc)
 
     if colors:
-        print(colors)
+        color_identity = colors.split(",")
+        if 'C' in color_identity:
+            query += " AND (color_identity && %s OR color_identity = '{}')"
+        else:
+            query += " AND color_identity && %s"
+        params.append(color_identity)
 
-    query += " ORDER BY name ASC LIMIT 100"
+    query += " ORDER BY name ASC LIMIT 100;"
+    print(query)
     
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(query, params)

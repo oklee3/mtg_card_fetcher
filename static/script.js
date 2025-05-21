@@ -15,7 +15,7 @@ async function searchCards() {
             if (cardName) url += `name=${encodeURIComponent(cardName)}&`;
             if (oracleText) url += `oracle=${encodeURIComponent(oracleText)}&`;
             if (cmc) url += `cmc=${encodeURIComponent(cmc)}&`;
-            if (colors) url+= 'colors=${encodeURIComponent(colors)}&`;'
+            if (colors.length > 0) url += `colors=${encodeURIComponent(colors.join(','))}&`;
             const response = await fetch(url);
             const cards = await response.json();
             

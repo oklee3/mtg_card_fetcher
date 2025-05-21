@@ -124,6 +124,7 @@ def insert_card_data(conn, card):
             face_image_uri_art_crop,
             card.get('color_identity', [])
         ))
+    conn.commit()
 
 def insert_set_data(conn, set):
     """
@@ -140,7 +141,7 @@ def insert_set_data(conn, set):
             set.get('set_type'),
             set.get('block')
         ))
-        
+    conn.commit()  
 
 def main():
     # connect to database
