@@ -66,16 +66,21 @@ def get_cards(conn):
         color_identity = colors.split(",")
         if colorLogic == "all":
             query += " AND color_identity @> %s"
-            params.append(color_identity)
+        elif colorLogic == "exact":
+            query += """
+                AND (SELECT array_agg(x ORDER BY x) FROM unnest(color_identity) x)
+                = (SELECT array_agg(x ORDER BY x) FROM unnest(%s) x)
+            """
         else:
             if 'C' in color_identity:
-                query += " AND (color_identity && %s OR color_identity = '{}')"
+                query += " AND color_identity && %s OR color_identity = '{}')"
             else:
                 query += " AND color_identity && %s"
-            params.append(color_identity)
+        params.append(color_identity)
 
     query += " ORDER BY name ASC LIMIT 100;"
     print(query)
+    print(params)
     
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(query, params)
